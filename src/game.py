@@ -4,10 +4,12 @@ import pygame
 
 from constant import *
 from board import Board
+from dragger import Dragger
 
 class Game:
     def __init__(self):
         self.board = Board()
+        self.dragger = Dragger()
 
     # Show Methods
 
@@ -30,7 +32,11 @@ class Game:
                 if self.board.squares[row][col].has_piece():
                     piece = self.board.squares[row][col].piece # pega a peça que está na posição especifica
 
-                    img = pygame.image.load(piece.texture) # carrega a imagem da peça
-                    img_center = (col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2) # define o centro da imagem
-                    piece.texture_rect = img.get_rect(center = img_center) # define o centro da imagem
-                    surface.blit(img, piece.texture_rect) # desenha a imagem na tela
+
+                    # todas as peças exceto a que eu estou arrastando
+                    if piece is not self.dragger.piece:
+                        piece.set_texture(size = 80)
+                        img = pygame.image.load(piece.texture) # carrega a imagem da peça
+                        img_center = (col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2) # define o centro da imagem
+                        piece.texture_rect = img.get_rect(center = img_center) # define o centro da imagem
+                        surface.blit(img, piece.texture_rect) # desenha a imagem na tela
