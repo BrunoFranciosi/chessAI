@@ -14,11 +14,13 @@ class Main:
 
     def mainLoop(self):                                             # executar o loop principal do jogo
 
+        #usar game e screen ao inves de se referir toda vez a self.game e self.screen
         screen = self.screen
         game = self.game
 
         while True:
             game.show_bg(screen)
+            game.show_pieces(screen)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

@@ -3,21 +3,34 @@
 import pygame
 
 from constant import *
+from board import Board
 
 class Game:
     def __init__(self):
-        pass
+        self.board = Board()
 
     # Show Methods
 
     def show_bg(self, surface):                     # recebe como parâmetro uma superfície onde será exibido o jogo (nesse caso, a tela do pygame).
-        for lin in range(ROWS):                     # percorridas todas as linhas e colunas do tabuleiro, definidas em ROWS e COLS
+        for row in range(ROWS):                     # percorridas todas as linhas e colunas do tabuleiro, definidas em ROWS e COLS
             for col in range(COLS):
-                if (lin + col) % 2 == 0:
+                if (row + col) % 2 == 0:
                     color = (234, 235, 200) # light green
                 else:
                     color = (119, 154, 88) # dark green
                 
-                rectangle = (col * SQSIZE, lin * SQSIZE, SQSIZE, SQSIZE)
+                rectangle = (col * SQSIZE, row * SQSIZE, SQSIZE, SQSIZE)
 
                 pygame.draw.rect(surface, color, rectangle)
+    
+    def show_pieces(self, surface):
+        for row in range(ROWS):
+            for col in range(COLS):
+                # checar se tem uma peça na posição especifica
+                if self.board.squares[row][col].has_piece():
+                    piece = self.board.squares[row][col].piece # pega a peça que está na posição especifica
+
+                    img = pygame.image.load(piece.texture) # carrega a imagem da peça
+                    img_center = (col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2) # define o centro da imagem
+                    piece.texture_rect = img.get_rect(center = img_center) # define o centro da imagem
+                    surface.blit(img, piece.texture_rect) # desenha a imagem na tela
