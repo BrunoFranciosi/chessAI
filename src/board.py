@@ -60,8 +60,6 @@ class Board:
                         #adicionar o movimento na lista de movimentos da peça
                         piece.add_move(move)
 
-
-
         def knight_moves():
             # 8 possiveis movimentos caso o cavalo esteja no centro do tabuleiro
             possible_moves = [
@@ -86,19 +84,99 @@ class Board:
                         move = Move(inicial, final)
                         piece.add_move(move) #adiciona o movimento na lista de movimentos da peça
 
+        def straightline_moves(incrs): #incrs = increments: "como" voce vai mover em linha reta
+            for incr in incrs:
+                row_incr, col_incr = incr
+                possible_move_row = row + row_incr
+                possible_move_col = col + col_incr
+
+                # enquanto a posição estiver dentro do tabuleiro e estiver vazia ou tiver uma peça rival, o loop vai continuar
+                while True:
+                    if Square.in_range(possible_move_row, possible_move_col):
+                        # criar squares do possivel novo movimento
+                        inicial = Square(row, col)
+                        final = Square(possible_move_row, possible_move_col)
+                        # criar um possivel novo movimento
+                        move = Move(inicial, final)
+                        
+                        #empty = continua o loop
+                        if self.squares[possible_move_row][possible_move_col].isempty():
+                            #append novo movimento
+                            piece.add_move(move)
+
+                        # has enemy piece = add move + break
+                        if self.squares[possible_move_row][possible_move_col].has_enemy_piece(piece.color):
+                            #append novo movimento
+                            piece.add_move(move)
+                            break
+
+                        # has team piece = break
+                        if self.squares[possible_move_row][possible_move_col].has_team_piece(piece.color):
+                            break
+                    # fora do tabuleiro
+                    else:
+                        break
+
+                    # incrementando incrs
+                    possible_move_row = possible_move_row + row_incr
+                    possible_move_col = possible_move_col + col_incr
+
+        def king_moves():
+            adjacent_squares = [
+                (row - 1, col + 0), # cima
+                (row -1, col + 1), # diagonal superior direita
+                (row + 0, col + 1), # direita
+                (row + 1, col + 1), # diagonal inferior direita
+                (row + 1, col + 0), # baixo
+                (row + 1, col - 1), # diagonal inferior esquerda
+                (row + 0, col - 1), # esquerda
+                (row - 1, col - 1), # diagonal superior esquerda
+            ]
+
+            for possible_move in adjacent_squares:
+                possible_move_row, possible_move_col = possible_move
+
+                if Square.in_range(possible_move_row, possible_move_col):
+                    if self.squares[possible_move_row][possible_move_col].isempty_or_enemy(piece.color):
+                        #criar squares do novo movimento
+                        inicial = Square(row, col)
+                        final = Square(possible_move_row, possible_move_col)
+                        #criar um novo movimento
+                        move = Move(inicial, final)
+                        #adicionar o movimento na lista de movimentos da peça
+                        piece.add_move(move)
 
         if piece.name == 'pawn':
             pawn_moves()
         elif piece.name == 'knight':
             knight_moves()
         elif piece.name == 'bishop':
-            pass
+            straightline_moves([
+                (-1, 1), # diagonal superior esquerda
+                (-1, -1), # diagonal superior direita
+                (1, 1), # diagonal inferior esquerda
+                (1, -1), # diagonal inferior direita
+            ])
         elif piece.name == 'rook':
-            pass
+            straightline_moves([
+                (-1, 0), # cima
+                (1, 0), # baixo
+                (0, 1), # direita
+                (0, -1), # esquerda
+            ])
         elif piece.name == 'queen':
-            pass
+            straightline_moves([
+                (-1, 1), # diagonal superior esquerda
+                (-1, -1), # diagonal superior direita
+                (1, 1), # diagonal inferior esquerda
+                (1, -1), # diagonal inferior direita
+                (-1, 0), # cima
+                (1, 0), # baixo
+                (0, 1), # direita
+                (0, -1), # esquerda
+            ])
         elif piece.name == 'king':
-            pass
+            king_moves()
 
 
         
@@ -121,7 +199,7 @@ class Board:
 
         # bispo
         self.squares[row_other][2] = Square(row_other, 2, Bishop(color))
-        self.squares[row_other][5] = Square(row_other, 5, Bishop(color))
+        self.squares[row_other][5] = Square(row_other, 5, Bishop(color))        
 
         # torre
         self.squares[row_other][0] = Square(row_other, 0, Rook(color))
