@@ -13,11 +13,11 @@ class Square:
     def has_team_piece(self, color):
         return self.has_piece() and self.piece.color == color
     
-    def has_rival_piece(self, color):
+    def has_enemy_piece(self, color):
         return self.has_piece() and self.piece.color != color #se tiver uma peça e a cor da peça for diferente da cor passada como parâmetro, retorna True, se não, retorna False
 
-    def isempty_or_rival(self, color):
-        return self.isempty() or self.has_rival_piece(color) #se não tiver uma peça ou se tiver uma peça e a cor da peça for diferente da cor passada como parâmetro, retorna True, se não, retorna False
+    def isempty_or_enemy(self, color):
+        return self.isempty() or self.has_enemy_piece(color) #se não tiver uma peça ou se tiver uma peça e a cor da peça for diferente da cor passada como parâmetro, retorna True, se não, retorna False
     
     @staticmethod #metodo estatico, não precisa de uma instancia da classe para ser chamado
     def in_range(*args):

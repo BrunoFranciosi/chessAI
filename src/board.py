@@ -20,6 +20,47 @@ class Board:
         '''
             calcular todas as possiveis ou validos movimentos para uma peça especifica para uma posição especifica        
         '''
+        def pawn_moves():
+            if piece.moved:
+                steps = 1 #se o peão já tiver se movido, ele só pode andar uma casa
+            else:
+                steps = 2 #se o peão ainda não tiver se movido, ele pode andar duas casas
+
+            # movimento na vertical
+            start = row + piece.direction #exemplo: se o peão for branco, ele vai andar para cima, então o start vai ser a linha atual - 1
+            end = row + (piece.direction * (1 + steps)) #exemplo: se o peão for branco, ele vai andar para cima, então o end vai ser a linha atual - 3(Execlusivo entao -2)
+            for possible_move_row in range(start, end, piece.direction):
+                if Square.in_range(possible_move_row):
+                    if self.squares[possible_move_row][col].isempty():
+                        #criar squares do novo movimento
+                        inicial = Square(row, col)
+                        final = Square(possible_move_row, col)
+                        #criar um novo movimento
+                        move = Move(inicial, final)
+                        #adicionar o movimento na lista de movimentos da peça
+                        piece.add_move(move)
+                    # bloqueado
+                    else:
+                        break
+                # fora do tabuleiro
+                else:
+                    break
+
+            # movimento na diagonal
+            possible_move_row = row + piece.direction
+            possible_move_cols = [col - 1, col + 1]
+            for possible_move_col in possible_move_cols:
+                if Square.in_range(possible_move_row, possible_move_col):
+                    if self.squares[possible_move_row][possible_move_col].has_enemy_piece(piece.color):
+                        #criar squares do novo movimento
+                        inicial = Square(row, col)
+                        final = Square(possible_move_row, possible_move_col)
+                        #criar um novo movimento
+                        move = Move(inicial, final)
+                        #adicionar o movimento na lista de movimentos da peça
+                        piece.add_move(move)
+
+
 
         def knight_moves():
             # 8 possiveis movimentos caso o cavalo esteja no centro do tabuleiro
@@ -37,7 +78,7 @@ class Board:
             for possible_move in possible_moves:
                 possible_move_row, possible_move_col = possible_move
                 if Square.in_range(possible_move_row, possible_move_col):
-                    if self.squares[possible_move_row][possible_move_col].isempty_or_rival(piece.color): #checando se a posição está vazia ou se tem uma peça rival(piece.doclor)
+                    if self.squares[possible_move_row][possible_move_col].isempty_or_enemy(piece.color): #checando se a posição está vazia ou se tem uma peça rival(piece.doclor)
                         #criar squares do novo movimento
                         inicial = Square(row, col)
                         final = Square(possible_move_row, possible_move_col)
@@ -47,7 +88,7 @@ class Board:
 
 
         if piece.name == 'pawn':
-            pass
+            pawn_moves()
         elif piece.name == 'knight':
             knight_moves()
         elif piece.name == 'bishop':
@@ -73,7 +114,7 @@ class Board:
         # peões
         for col in range(COLS):
             self.squares[row_pawn][col] = Square(row_pawn, col, Pawn(color)) #adiciona o peão na linha 6 ou 1, dependendo da cor, e na coluna que estivermos
-
+        
         # cavalo
         self.squares[row_other][1] = Square(row_other, 1, Knight(color))
         self.squares[row_other][6] = Square(row_other, 6, Knight(color))
