@@ -23,7 +23,7 @@ class Piece:
             f'assets/images/imgs-{size}px/{self.color}_{self.name}.png' #vamos passar o caminho para encontrar uma imagem especifica
         )
     
-    def add_moves(self, move):
+    def add_move(self, move):
         self.moves.append(move) #adiciona o movimento na lista de movimentos da peça
 
 

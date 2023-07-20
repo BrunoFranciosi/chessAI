@@ -23,13 +23,15 @@ class Main:
 
         while True:
             game.show_bg(screen)
+            game.show_moves(screen)
             game.show_pieces(screen)
 
             if dragger.dragging:
                 dragger.update_blit(screen)
 
+            #click mouse
             for event in pygame.event.get():
-                if event.type == pygame.MOUSEBUTTONDOWN:    #click mouse
+                if event.type == pygame.MOUSEBUTTONDOWN:
                     dragger.update_mouse(event.pos)                    #print(event.pos)                # vamos pegar essas possições e passar para o update_mouse
 
                     clicked_row = int(dragger.mouseY // SQSIZE) # clicked_row eh a linha que foi clicada, dragger.mouseY eh a posição do mouse em Y
@@ -37,17 +39,28 @@ class Main:
 
                     if board.squares[clicked_row][clicked_col].has_piece(): #se tiver uma peça na posição clicada
                         piece = board.squares[clicked_row][clicked_col].piece
+                        board.calc_moves(piece, clicked_row, clicked_col) #calcula os movimentos validos para a peça clicada
                         dragger.save_initial(event.pos) #salva a posição inicial do mouse, precisamos disso pois se o usuario fizer um movimento invalido, a peça tem que voltar para a posição inicial
                         dragger.drag_piece(piece) #pega a peça que foi clicada e arrasta ela
+
+                        # show methods
+                        game.show_bg(screen)
+                        game.show_moves(screen)
+                        game.show_pieces(screen)
                     
-                elif event.type == pygame.MOUSEMOTION:      #mouse em movimento
+                #mouse em movimento
+                elif event.type == pygame.MOUSEMOTION:
                     if dragger.dragging:
                         dragger.update_mouse(event.pos)
+
+                        #show methods
                         game.show_bg(screen)
+                        game.show_moves(screen)
                         game.show_pieces(screen)
                         dragger.update_blit(screen)
 
-                elif event.type == pygame.MOUSEBUTTONUP:    #mouse solto
+                #mouse solto
+                elif event.type == pygame.MOUSEBUTTONUP:
                     dragger.undrag_piece()
 
                 if event.type == pygame.QUIT:               #fechar janela

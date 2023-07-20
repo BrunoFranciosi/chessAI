@@ -40,3 +40,20 @@ class Game:
                         img_center = (col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2) # define o centro da imagem
                         piece.texture_rect = img.get_rect(center = img_center) # define o centro da imagem
                         surface.blit(img, piece.texture_rect) # desenha a imagem na tela
+
+
+    def show_moves(self, surface):
+        if self.dragger.dragging:
+            piece = self.dragger.piece # pega a peça que está sendo arrastada que queremos mostrar os movimentos
+
+            #loop todos os movimentos validos
+            for move in piece.moves:
+                #colorir o quadrado do movimento
+                if (move.final.row + move.final.col) % 2 == 0:
+                    color = '#C86464'
+                else:
+                    color = '#C84646'
+                
+                rectangle = (move.final.col * SQSIZE, move.final.row * SQSIZE, SQSIZE, SQSIZE)
+
+                pygame.draw.rect(surface, color, rectangle)

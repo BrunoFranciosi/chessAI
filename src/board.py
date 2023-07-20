@@ -1,6 +1,7 @@
 from constant import *
 from square import Square
 from piece import *
+from move import Move
 
 class Board:
     def __init__(self):
@@ -15,10 +16,51 @@ class Board:
             for col in range(COLS):
                 self.squares[row][col] = Square(row, col) #criamos um quadrado para cada posição do tabuleiro
     
-    def _create(self):          # "_" significa que o método é privado
-        for row in range(ROWS):
-            for col in range(COLS):
-                self.squares[row][col] = Square(row, col) #criamos um quadrado para cada posição do tabuleiro
+    def calc_moves(self, piece, row, col):
+        '''
+            calcular todas as possiveis ou validos movimentos para uma peça especifica para uma posição especifica        
+        '''
+
+        def knight_moves():
+            # 8 possiveis movimentos caso o cavalo esteja no centro do tabuleiro
+            possible_moves = [
+                (row - 2, col + 1),
+                (row - 1, col + 2),
+                (row + 1, col + 2),
+                (row + 2, col + 1),
+                (row + 2, col - 1),
+                (row + 1, col - 2),
+                (row - 1, col - 2),
+                (row - 2, col - 1),
+            ]
+
+            for possible_move in possible_moves:
+                possible_move_row, possible_move_col = possible_move
+                if Square.in_range(possible_move_row, possible_move_col):
+                    if self.squares[possible_move_row][possible_move_col].isempty_or_rival(piece.color): #checando se a posição está vazia ou se tem uma peça rival(piece.doclor)
+                        #criar squares do novo movimento
+                        inicial = Square(row, col)
+                        final = Square(possible_move_row, possible_move_col)
+                        #criar um novo movimento
+                        move = Move(inicial, final)
+                        piece.add_move(move) #adiciona o movimento na lista de movimentos da peça
+
+
+        if piece.name == 'pawn':
+            pass
+        elif piece.name == 'knight':
+            knight_moves()
+        elif piece.name == 'bishop':
+            pass
+        elif piece.name == 'rook':
+            pass
+        elif piece.name == 'queen':
+            pass
+        elif piece.name == 'king':
+            pass
+
+
+        
 
     def _add_pieces(self, color): # em cima já fizemos os "squares" que não pussuem peças, agora vamos adicionar as peças em cada quadrado
         # row_pawn = 1 if color == 'white' else 6  =>  mesmo codigo de baixo
