@@ -83,7 +83,9 @@ class Main:
 
                         #verificar se o movimento é valido
                         if board.valid_move(dragger.piece, move):
+                            captured = board.squares[released_row][released_col].has_piece()
                             board.move(dragger.piece, move)
+                            game.sound_effect(captured)
                             #show methods
                             game.show_bg(screen)
                             game.show_last_move(screen)
@@ -96,6 +98,18 @@ class Main:
 
 
                     dragger.undrag_piece()
+
+                #tecla pressionada
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_t:
+                        game.change_theme()
+
+                    if event.key == pygame.K_r:
+                        game.reset()
+                        game = self.game
+                        board = self.game.board
+                        dragger = self.game.dragger
+                        
 
 
                 #fechar janela
