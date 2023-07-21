@@ -19,6 +19,21 @@ class Board:
         self.squares[inicial.row][inicial.col].piece = None
         self.squares[final.row][final.col].piece = piece
 
+        # promoção do peão
+        if piece.name == 'pawn':
+            self.pawn_promotion(piece, final)
+            
+        # roque
+        if isinstance(piece, King):
+            if self.roque(inicial, final):
+                diff = final.col - inicial.col
+                if (diff < 0):
+                    rook = piece.left_rook
+                else:
+                    rook = piece.right_rook
+                self.move(rook, rook.moves[-1])
+
+
         #move
         piece.moved = True
 
@@ -31,6 +46,14 @@ class Board:
 
     def valid_move(self, piece, move):
         return move in piece.moves
+
+    def pawn_promotion(self, piece, final):
+        if final.row == 0 or final.row == 7: #nao preciso checar a cor, pois o peão só pode chegar na ultima linha do tabuleiro
+            self.squares[final.row][final.col].piece = Queen(piece.color) #se o peão chegar na ultima linha, ele vai virar uma rainha
+
+
+    def roque(self, inicial, final):
+        return abs(inicial.col - final.col) == 2 #se a diferença entre a coluna inicial e a final for igual a 2, o roque é valido
 
     def _create(self):          # "_" significa que o método é privado
         for row in range(ROWS):
@@ -167,6 +190,57 @@ class Board:
                         #adicionar o movimento na lista de movimentos da peça
                         piece.add_move(move)
 
+        # movimento do roque
+        if not piece.moved:
+            # roque grande
+            left_rook = self.squares[row][0].piece
+            if isinstance(left_rook, Rook):
+                if not left_rook.moved:
+                    for c in range(1, 4):
+                        if self.squares[row][c].has_piece(): # roque nao eh possivel, só pode ser feito se não tiver nenhuma peça entre o rei e a torre
+                            break
+
+                        if c == 3:
+                            # add left rook to king
+                            piece.left_rook = left_rook
+
+                            # rook move
+                            inicial = Square(row, 0)
+                            final = Square(row, 3)
+                            move = Move(inicial, final)
+                            left_rook.add_move(move)
+
+                            # king move
+                            inicial = Square(row, col)
+                            final = Square(row, 2)
+                            move = Move(inicial, final)
+                            piece.add_move(move)
+
+            # roque pequeno
+            right_rook = self.squares[row][7].piece
+            if isinstance(right_rook, Rook):
+                if not right_rook.moved:
+                    for c in range(5, 7):
+                        if self.squares[row][c].has_piece(): # roque nao eh possivel, só pode ser feito se não tiver nenhuma peça entre o rei e a torre
+                            break
+
+                        if c == 6:
+                            # add right rook to king
+                            piece.right_rook = right_rook
+
+                            # rook move
+                            inicial = Square(row, 7)
+                            final = Square(row, 5)
+                            move = Move(inicial, final)
+                            right_rook.add_move(move)
+
+                            # king move
+                            inicial = Square(row, col)
+                            final = Square(row, 6)
+                            move = Move(inicial, final)
+                            piece.add_move(move)
+        
+        
         if piece.name == 'pawn':
             pawn_moves()
         elif piece.name == 'knight':

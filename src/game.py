@@ -81,6 +81,7 @@ class Game:
             #loop todos os movimentos validos
             for move in piece.moves:
                 #colorir o quadrado do movimento
+                # color = theme.moves.light
                 if (move.final.row + move.final.col) % 2 == 0:
                     color = theme.moves.light
                 else:
