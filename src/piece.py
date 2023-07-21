@@ -26,6 +26,9 @@ class Piece:
     def add_move(self, move):
         self.moves.append(move) #adiciona o movimento na lista de movimentos da peça
 
+    def clear_moves(self):
+        self.moves = []
+
 
 
 class Pawn(Piece):  # em python para falar que uma classe herda de outra, basta colocar o nome da classe pai entre parenteses

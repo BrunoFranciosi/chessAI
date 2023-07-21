@@ -4,6 +4,8 @@ import sys
 from constant import *
 from game import Game
 from dragger import Dragger
+from square import Square
+from move import Move
 
 class Main:
     def __init__(self):
@@ -23,6 +25,7 @@ class Main:
 
         while True:
             game.show_bg(screen)
+            game.show_last_move(screen)
             game.show_moves(screen)
             game.show_pieces(screen)
 
@@ -39,14 +42,17 @@ class Main:
 
                     if board.squares[clicked_row][clicked_col].has_piece(): #se tiver uma peça na posição clicada
                         piece = board.squares[clicked_row][clicked_col].piece
-                        board.calc_moves(piece, clicked_row, clicked_col) #calcula os movimentos validos para a peça clicada
-                        dragger.save_initial(event.pos) #salva a posição inicial do mouse, precisamos disso pois se o usuario fizer um movimento invalido, a peça tem que voltar para a posição inicial
-                        dragger.drag_piece(piece) #pega a peça que foi clicada e arrasta ela
+                        #valid piece (color)
+                        if piece.color == game.next_player:
+                            board.calc_moves(piece, clicked_row, clicked_col) #calcula os movimentos validos para a peça clicada
+                            dragger.save_initial(event.pos) #salva a posição inicial do mouse, precisamos disso pois se o usuario fizer um movimento invalido, a peça tem que voltar para a posição inicial
+                            dragger.drag_piece(piece) #pega a peça que foi clicada e arrasta ela
 
-                        # show methods
-                        game.show_bg(screen)
-                        game.show_moves(screen)
-                        game.show_pieces(screen)
+                            # show methods
+                            game.show_bg(screen)
+                            game.show_last_move(screen)
+                            game.show_moves(screen)
+                            game.show_pieces(screen)
                     
                 #mouse em movimento
                 elif event.type == pygame.MOUSEMOTION:
@@ -55,15 +61,45 @@ class Main:
 
                         #show methods
                         game.show_bg(screen)
+                        game.show_last_move(screen)
                         game.show_moves(screen)
                         game.show_pieces(screen)
                         dragger.update_blit(screen)
 
                 #mouse solto
                 elif event.type == pygame.MOUSEBUTTONUP:
+
+                    if dragger.dragging:
+                        dragger.update_mouse(event.pos)
+
+                        #pegar a linha e coluna que o mouse foi solto
+                        released_row = int(dragger.mouseY // SQSIZE)
+                        released_col = int(dragger.mouseX // SQSIZE)
+
+                        #criar possivel movimento
+                        inicial = Square(dragger.initial_row, dragger.initial_col)
+                        final = Square(released_row, released_col)
+                        move = Move(inicial, final)
+
+                        #verificar se o movimento é valido
+                        if board.valid_move(dragger.piece, move):
+                            board.move(dragger.piece, move)
+                            #show methods
+                            game.show_bg(screen)
+                            game.show_last_move(screen)
+                            game.show_pieces(screen)
+
+                            #next turn
+                            game.next_turn()
+
+
+
+
                     dragger.undrag_piece()
 
-                if event.type == pygame.QUIT:               #fechar janela
+
+                #fechar janela
+                if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
 

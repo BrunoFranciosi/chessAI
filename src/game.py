@@ -8,6 +8,7 @@ from dragger import Dragger
 
 class Game:
     def __init__(self):
+        self.next_player = "white"
         self.board = Board()
         self.dragger = Dragger()
 
@@ -57,3 +58,30 @@ class Game:
                 rectangle = (move.final.col * SQSIZE, move.final.row * SQSIZE, SQSIZE, SQSIZE)
 
                 pygame.draw.rect(surface, color, rectangle)
+
+    
+    def show_last_move(self, surface):
+        if self.board.last_move:
+            inicial = self.board.last_move.inicial
+            final = self.board.last_move.final
+
+            for pos in [inicial, final]:
+                if (pos.row + pos.col) % 2 == 0:
+                    color = (244, 247, 116)
+                else:
+                    color = (172, 165, 51)
+
+                rectangle = (pos.col * SQSIZE, pos.row * SQSIZE, SQSIZE, SQSIZE)
+
+                pygame.draw.rect(surface, color, rectangle)
+
+    def show_hover(self):
+        pass
+
+    #other methods
+
+    def next_turn(self):
+        if self.next_player == "white":
+            self.next_player = "black"
+        else:
+            self.next_player = "white"

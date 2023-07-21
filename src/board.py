@@ -6,10 +6,31 @@ from move import Move
 class Board:
     def __init__(self):
         self.squares = [[0, 0, 0, 0, 0, 0, 0, 0,] for col in range(COLS)] #para cada COLUNA nos vamos adicionar  uma lista de 8 zeros
-
+        self.last_move = None #ultimo movimento feito
         self._create() #cria o tabuleiro
         self._add_pieces('white') #adiciona as peças brancas
         self._add_pieces('black') #adiciona as peças pretas
+
+    def move(self, piece, move):
+        inicial = move.inicial
+        final = move.final
+
+        # atualiza o tabuleiro do console
+        self.squares[inicial.row][inicial.col].piece = None
+        self.squares[final.row][final.col].piece = piece
+
+        #move
+        piece.moved = True
+
+        #clear valide moves
+        piece.clear_moves()
+
+        # set last move
+        self.last_move = move
+
+
+    def valid_move(self, piece, move):
+        return move in piece.moves
 
     def _create(self):          # "_" significa que o método é privado
         for row in range(ROWS):
@@ -177,8 +198,6 @@ class Board:
             ])
         elif piece.name == 'king':
             king_moves()
-
-
         
 
     def _add_pieces(self, color): # em cima já fizemos os "squares" que não pussuem peças, agora vamos adicionar as peças em cada quadrado

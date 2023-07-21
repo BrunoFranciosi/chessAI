@@ -24,8 +24,8 @@ class Dragger:
         self.mouseX, self.mouseY = pos #(xcor, ycor)
 
     def save_initial(self, pos):
-        self.initial_row = pos[1] // SQSIZE
-        self.initial_col = pos[0] // SQSIZE
+        self.initial_row = int(pos[1] // SQSIZE)
+        self.initial_col = int(pos[0] // SQSIZE)
     
     def drag_piece(self, piece):
         self.piece = piece
