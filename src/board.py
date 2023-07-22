@@ -3,6 +3,8 @@ from square import Square
 from piece import *
 from move import Move
 import copy
+from sound import Sound
+import os
 
 class Board:
     def __init__(self):
@@ -12,21 +14,34 @@ class Board:
         self._add_pieces('white') #adiciona as peças brancas
         self._add_pieces('black') #adiciona as peças pretas
 
-    def move(self, piece, move):
+    def move(self, piece, move, testing=False):
         inicial = move.inicial
         final = move.final
+
+        en_passant_empty = self.squares[final.row][final.col].isempty()
 
         # atualiza o tabuleiro do console
         self.squares[inicial.row][inicial.col].piece = None
         self.squares[final.row][final.col].piece = piece
+       
 
-        # promoção do peão
-        if piece.name == 'pawn':
-            self.pawn_promotion(piece, final)
+        # promoção do peão e en passant
+        if isinstance(piece, Pawn):
+            diff = final.col - inicial.col
+            if diff != 0 and en_passant_empty:
+                self.squares[inicial.row][inicial.col + diff].piece = None
+                self.squares[final.row][final.col].piece = piece
+                if not testing:
+                    sound = Sound(os.path.join('assets/sounds', 'capture.wav'))
+                    sound.play()
+                           
+            else:
+                # pawn promotion
+                self.pawn_promotion(piece, final)
             
         # roque
         if isinstance(piece, King):
-            if self.roque(inicial, final):
+            if self.roque(inicial, final) and not testing:
                 diff = final.col - inicial.col
                 if (diff < 0):
                     rook = piece.left_rook
@@ -56,10 +71,24 @@ class Board:
     def roque(self, inicial, final):
         return abs(inicial.col - final.col) == 2 #se a diferença entre a coluna inicial e a final for igual a 2, o roque é valido
 
+
+    
+    def set_true_en_passant(self, piece):
+        if not isinstance(piece, Pawn):
+            return
+
+        for row in range(ROWS):
+            for col in range(COLS):
+                if isinstance(self.squares[row][col].piece, Pawn):
+                    self.squares[row][col].piece.en_passant = False
+        
+        piece.en_passant = True
+        
+
     def check(self, piece, move):
         temp_piece = copy.deepcopy(piece) #cria uma copia da peça
         temp_board = copy.deepcopy(self) #cria uma copia do tabuleiro
-        temp_board.move(temp_piece, move) #move a peça na copia do tabuleiro
+        temp_board.move(temp_piece, move, testing=True) #move a peça na copia do tabuleiro
 
         for row in range(ROWS):
             for col in range(COLS):
@@ -137,6 +166,54 @@ class Board:
                                 piece.add_move(move)
                         else:
                             piece.add_move(move)  
+            
+            # en passant movimento
+            if piece.color == "white":
+                r = 3
+                final_row = 2
+            else:
+                r = 4
+                final_row = 5
+            #left en passant
+            if Square.in_range(col-1) and row == r:
+                if self.squares[row][col-1].has_enemy_piece(piece.color):
+                    p = self.squares[row][col-1].piece
+                    if isinstance(p, Pawn):
+                        if p.en_passant:
+                            #criar squares do novo movimento
+                            inicial = Square(row, col)
+                            final = Square(final_row, col-1, p)
+                            #criar um novo movimento
+                            move = Move(inicial, final)
+
+                            # check potential check
+                            if bool:
+                                if not self.check(piece, move):
+                                    #adicionar o movimento na lista de movimentos da peça
+                                    piece.add_move(move)
+                            else:
+                                piece.add_move(move)
+            
+            #right en passant
+            if Square.in_range(col+1) and row == r:
+                if self.squares[row][col+1].has_enemy_piece(piece.color):
+                    p = self.squares[row][col+1].piece
+                    if isinstance(p, Pawn):
+                        if p.en_passant:
+                            #criar squares do novo movimento
+                            inicial = Square(row, col)
+                            final = Square(final_row, col+1, p)
+                            #criar um novo movimento
+                            move = Move(inicial, final)
+
+                            # check potential check
+                            if bool:
+                                if not self.check(piece, move):
+                                    #adicionar o movimento na lista de movimentos da peça
+                                    piece.add_move(move)
+                            else:
+                                piece.add_move(move)
+
 
         def knight_moves():
             # 8 possiveis movimentos caso o cavalo esteja no centro do tabuleiro

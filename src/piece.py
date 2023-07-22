@@ -41,6 +41,8 @@ class Pawn(Piece):  # em python para falar que uma classe herda de outra, basta 
         else:
             self.direction = 1
         
+        self.en_passant = False # se o peão pode fazer o en passant ou não
+        
         super().__init__('pawn', color, 1.0) #super() é usado para chamar o construtor da classe pai, no caso Piece, e passar os parametros que ele precisa
 
 class Knight(Piece): # so nao vai ter a direção, pois o cavalo pode andar para qualquer lado
