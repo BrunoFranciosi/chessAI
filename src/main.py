@@ -44,7 +44,7 @@ class Main:
                         piece = board.squares[clicked_row][clicked_col].piece
                         #valid piece (color)
                         if piece.color == game.next_player:
-                            board.calc_moves(piece, clicked_row, clicked_col) #calcula os movimentos validos para a peça clicada
+                            board.calc_moves(piece, clicked_row, clicked_col, bool=True) #calcula os movimentos validos para a peça clicada
                             dragger.save_initial(event.pos) #salva a posição inicial do mouse, precisamos disso pois se o usuario fizer um movimento invalido, a peça tem que voltar para a posição inicial
                             dragger.drag_piece(piece) #pega a peça que foi clicada e arrasta ela
 
